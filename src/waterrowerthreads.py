@@ -29,6 +29,7 @@ from queue import Queue
 from collections import deque
 
 from adapters.ble import waterrowerble
+from adapters.ble import waterrowerble_cycling
 from adapters.s4 import wrtobleant
 from adapters.ant import waterrowerant
 from adapters.smartrow import smartrowtobleant
@@ -58,9 +59,14 @@ def main(args=None):
     logging.config.fileConfig(loggerconfigpath, disable_existing_loggers=False)
     grace = Graceful()
 
+    # def BleService(out_q, ble_in_q):
+    #     logger.info("Start BLE Advertise and BLE GATT Server")
+    #     bleService = waterrowerble.main(out_q, ble_in_q)
+    #     bleService()
+
     def BleService(out_q, ble_in_q):
         logger.info("Start BLE Advertise and BLE GATT Server")
-        bleService = waterrowerble.main(out_q, ble_in_q)
+        bleService = waterrowerble_cycling.main(out_q, ble_in_q)
         bleService()
 
 

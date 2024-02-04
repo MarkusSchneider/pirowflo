@@ -1,0 +1,13 @@
+[Unit]
+Description=Water Rower BLE service
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+User=dietpi
+ExecStart=/usr/bin/python3 /home/dietpi/pirowflo/src/waterrowerthreads.py -i s4 -b -a
+
+[Install]
+WantedBy=multi-user.target
