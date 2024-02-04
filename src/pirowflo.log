@@ -237,3 +237,16 @@
 2024-02-04 11:52:09,402 - adapters.ble.ble - INFO - returning props
 2024-02-04 11:52:09,442 - adapters.ble.waterrowerble_cycling - INFO - GATT application registered
 2024-02-04 11:52:09,449 - adapters.ble.waterrowerble_cycling - INFO - Advertisement registered
+2024-02-04 16:40:16,916 - __main__ - INFO - inferface S4 monitor will be used for data input
+2024-02-04 16:40:16,918 - __main__ - INFO - Waterrower Interface started
+2024-02-04 16:40:16,919 - __main__ - INFO - sr not selected
+2024-02-04 16:40:16,924 - __main__ - INFO - Start BLE Advertise and BLE GATT Server
+2024-02-04 16:40:16,929 - __main__ - INFO - Start Ant and start broadcast data
+2024-02-04 16:40:16,975 - adapters.ble.waterrowerble_cycling - INFO - Registering GATT application...
+2024-02-04 16:40:16,998 - adapters.ble.ble - INFO - GetManagedObjects
+2024-02-04 16:40:17,004 - adapters.s4.waterrowerinterface - WARNING - port not found in 1 attempts; retrying every 5s
+2024-02-04 16:40:17,006 - adapters.ble.ble - INFO - GetAll
+2024-02-04 16:40:17,020 - adapters.ble.ble - INFO - returning props
+2024-02-04 16:40:17,053 - adapters.ble.waterrowerble_cycling - INFO - GATT application registered
+2024-02-04 16:40:17,059 - adapters.ble.waterrowerble_cycling - INFO - Advertisement registered
+2024-02-04 16:40:20,597 - __main__ - INFO - Quit gracefully program has been interrupt externally - exiting
