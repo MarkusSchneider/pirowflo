@@ -69,7 +69,6 @@ def main(args=None):
         bleService = waterrowerble_cycling.main(out_q, ble_in_q)
         bleService()
 
-
     def Waterrower(in_q, ble_out_q, ant_out_q):
         logger.info("Waterrower Interface started")
         Waterrowerserial = wrtobleant.main(in_q, ble_out_q, ant_out_q)
@@ -128,6 +127,7 @@ def main(args=None):
     while grace.run:
         for thread in threads:
             if grace.run == True:
+                
                 thread.join(timeout=10)
                 if not thread.is_alive():
                     logger.info("Thread died - exiting")
