@@ -340,7 +340,7 @@ class CyclingPowerData(Characteristic):
             #      b14   = n/a
             #      b15   = n/a
             #    B2:3    = SINT16 - Instataineous power, Watts (decimal)
-            #    B4      = UINT8 -  Pedal power balance, Percent (binary) 1/2
+            #    B4      = UINT8  -  Pedal power balance, Percent (binary) 1/2
             #    B5:6    = UINT16 - Accumulated torque, Nm; res (binary) 1/32
             #    B7:10   = UINT32 - Cumulative wheel revolutions, (decimal)
             #    B11:12  = UINT16 - Last wheel event time, second (binary) 1/2048
@@ -359,27 +359,32 @@ class CyclingPowerData(Characteristic):
         if ble_in_q_value:
             values = Convert_Waterrower_raw()
             power = values["watts"].to_bytes(2, 'little')
-            cadance = (values["total_strokes"] * 2).to_bytes(2, 'little')
-            time = values["elapsedtime"].to_bytes(2, 'little')
+            cadence = (values["total_strokes"] * 2).to_bytes(2, 'little')
+            elapsedtime = (values["elapsedtime"] * 1024) & 0xFFFF
+            time = elapsedtime.to_bytes(2, 'little')
+            
+            logger.info("total_strokes: " + str(values["total_strokes"]))
+            logger.info("elapsedtime: " + str(values["elapsedtime"]))
 
-            value = [dbus.Byte(0b00100011), dbus.Byte(0x00),                              # 16-bit Flags
-                     dbus.Byte(power[0]), dbus.Byte(power[1]),                            # Instantaneous power
-                     dbus.Byte(0x00),                                                     # Pedal power balance
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    #  Accumulated torque
-                     dbus.Byte(0x00), dbus.Byte(0x00), dbus.Byte(0x00), dbus.Byte(0x00),  # Cumulative wheel revolutions
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Last wheel event time
-                     dbus.Byte(cadance[0]), dbus.Byte(cadance[1]),                        # Cumulative crank revolutions
-                     dbus.Byte(time[0]), dbus.Byte(time[1]),                              # Last crank event time
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Max force magnitude
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Max force magnitude
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Max torque magnitude
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Min torque magnitude
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Max angle
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Min angle
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Top dead spot angle
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Bottom dead spot angle
-                     dbus.Byte(0x00), dbus.Byte(0x00),                                    # Accumulated energy
-                     ]
+            value = [
+                dbus.Byte(0b00100001), dbus.Byte(0x00),                     # 16-bit Flags
+                dbus.Byte(power[0]), dbus.Byte(power[1]),                   #    B2:3    = SINT16 - Instataineous power, Watts (decimal)
+                #    B4      = UINT8  -  Pedal power balance, Percent (binary) 1/2
+                #    B5:6    = UINT16 - Accumulated torque, Nm; res (binary) 1/32
+                #    B7:10   = UINT32 - Cumulative wheel revolutions, (decimal)
+                #    B11:12  = UINT16 - Last wheel event time, second (binary) 1/2048
+                dbus.Byte(cadence[0]), dbus.Byte(cadence[1]),                #    B13:14  = UINT16 - Cumulative crank revolutions, (decimal)
+                dbus.Byte(time[0]), dbus.Byte(time[1])                       #    B15:16  = UINT16 - Last crank event time, second (binary) 1/1024 
+                #    B17:18  = SINT16 - Max force magnitude, Newton (decimal)
+                #    B19:20  = SINT16 - Min force magnitude, Newton (decimal)
+                #    B21:22  = SINT16 - Max torque magnitude, Nm (binary) 1/1024
+                #    B23:24  = SINT16 - Min torque magnitude, Nm (binary) 1/1024
+                #    B25:26  = UINT12 - Max angle, degree (decimal)
+                #    B27:28  = UINT12 - Min angle, degree (decimal)
+                #    B29:30  = UINT16 - Top dead spot angle, degree (decimal)
+                #    B31:32  = UINT16 - Bottom dead spot angle, degree (decimal)
+                #    B33:34  = UINT16 - Accumulated energy, kJ (decimal)
+            ]
 
             self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': value }, [])
             return self.notifying
