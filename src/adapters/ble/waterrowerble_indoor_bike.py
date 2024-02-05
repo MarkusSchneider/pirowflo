@@ -241,147 +241,103 @@ class SoftwareRevisionString(Characteristic):
         print('SoftwareRevisionString: ' + repr(self.value))
         return self.value
 
-class CyclingPowerService(Service):
-    CYCLING_POWER_UUID = '1818'
+class FitnessMachineService(Service):
+    FITNESS_MACHINE_UUID = '1826'
 
     def __init__(self, bus, index):
-        Service.__init__(self, bus, index, self.CYCLING_POWER_UUID, True)
-        self.add_characteristic(CyclingPowerFeature(bus,0,self))
-        self.add_characteristic(CyclingPowerData(bus, 1, self))
+        Service.__init__(self, bus, index, self.FITNESS_MACHINE_UUID, True)
+        self.add_characteristic(FitnessMachineFeature(bus,0,self))
+        self.add_characteristic(IndoorBikeData(bus, 1, self))
         self.add_characteristic(FitnessMachineControlPoint(bus, 2, self))
 
-class CyclingPowerFeature(Characteristic):
+class FitnessMachineFeature(Characteristic):
 
-    CYCLING_POWER_FEATURE_UUID = '2a65'
+    FITNESS_MACHINE_FEATURE_UUID = '2ACC'
 
     def __init__(self, bus, index, service):
         Characteristic.__init__(
             self, bus, index,
-            self.CYCLING_POWER_FEATURE_UUID,
+            self.FITNESS_MACHINE_FEATURE_UUID,
             ['read'],
             service)
         self.notifying = False
 
-        # Configure the Cycle Power Feature characteristic
-        # See: https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.cycling_power_feature.xml
-        # Properties = Read
-        # Min Len    = 1
-        # Max Len    = 32
-        #    B0:3    = UINT8 - Cycling Power Feature (MANDATORY)
-        #      b0    = Pedal power balance supported; 0 = false, 1 = true
-        #      b1    = Accumulated torque supported; 0 = false, 1 = true
-        #      b2    = Wheel revolution data supported; 0 = false, 1 = true
-        #      b3    = Crank revolution data supported; 0 = false, 1 = true
-        #      b4    = Extreme magnatudes supported; 0 = false, 1 = true
-        #      b5    = Extreme angles supported; 0 = false, 1 = true
-        #      b6    = Top/bottom dead angle supported; 0 = false, 1 = true
-        #      b7    = Accumulated energy supported; 0 = false, 1 = true
-        #      b8    = Offset compensation indicator supported; 0 = false, 1 = true
-        #      b9    = Offset compensation supported; 0 = false, 1 = true
-        #      b10   = Cycling power measurement characteristic content masking supported; 0 = false, 1 = true
-        #      b11   = Multiple sensor locations supported; 0 = false, 1 = true
-        #      b12   = Crank length adj. supported; 0 = false, 1 = true
-        #      b13   = Chain length adj. supported; 0 = false, 1 = true
-        #      b14   = Chain weight adj. supported; 0 = false, 1 = true
-        #      b15   = Span length adj. supported; 0 = false, 1 = true
-        #      b16   = Sensor measurement context; 0 = force, 1 = torque
-        #      b17   = Instantaineous measurement direction supported; 0 = false, 1 = true
-        #      b18   = Factory calibrated date supported; 0 = false, 1 = true
-        #      b19   = Enhanced offset compensation supported; 0 = false, 1 = true
-        #   b20:21   = Distribtue system support; 0 = legacy, 1 = not supported, 2 = supported, 3 = RFU
-        #   b22:32   = Reserved
-        self.value = [dbus.Byte(0),dbus.Byte(0),dbus.Byte(0),dbus.Byte(0)]
+        # Bit  Definition
+        # 0     Average Speed Supported
+        # 1     Cadence Supported
+        # 2     Total Distance Supported
+        # 3     Inclination Supported
+        # 4     Elevation Gain Supported
+        # 5     Pace Supported
+        # 6     Step Count Supported
+        # 7     Resistance Level Supported
+        # 8     Stride Count Supported
+        # 9     Expended Energy Supported
+        # 10    Heart Rate Measurement Supported
+        # 11    Metabolic Equivalent Supported
+        # 12    Elapsed Time Supported
+        # 13    Remaining Time Supported
+        # 14    Power Measurement Supported
+        # 15    Force on Belt and Power Output Supported
+        # 16    User Data Retention Supported
+        # 17-31 Reserved for Future Use
+        
+        # Fitness Machine Features (32bit), Target Setting Features (32bit)
+        self.value = [dbus.Byte(0),dbus.Byte(0),dbus.Byte(0),dbus.Byte(0),dbus.Byte(0),dbus.Byte(0),dbus.Byte(0),dbus.Byte(0)]
 
-        self.value[0] = 0x00001011
-        self.value[1] = 0x00
-        self.value[2] = 0x00
-        self.value[3] = 0x00
+        self.value[0] = 0b00001010
+        self.value[1] = 0b00100000
+        self.value[2] = 0b00000000
+        self.value[3] = 0b00000000
+        self.value[4] = 0b00000000
+        self.value[5] = 0b00000000
+        self.value[6] = 0b00000000
+        self.value[7] = 0b00000000
 
     def ReadValue(self, options):
-        print('CYCLING POWER Feature: ' + repr(self.value))
+        print('FITNESS MACHINE Feature: ' + repr(self.value))
         return self.value
 
-class CyclingPowerData(Characteristic):
-    CYCLING_POWER_MEASUREMENT_UUID = '2a63'
+class IndoorBikeData(Characteristic):
+    INDOOR_BIKE_DATA_UUID = '2AD2'
 
     def __init__(self, bus, index, service):
         Characteristic.__init__(
             self, bus, index,
-            self.CYCLING_POWER_MEASUREMENT_UUID,
+            self.INDOOR_BIKE_DATA_UUID,
             ['notify'],
             service)
         self.notifying = False
         self.iter = 0
 
     def Waterrower_cb(self):
-
-            # Configure the Cycle Power Measurement characteristic
-            # See: https://www.bluetooth.com/specifications/gatt/viewer?attributeXmlFile=org.bluetooth.characteristic.cycling_power_measurement.xml
-            # Properties = Notify
-            # Min Len    = 2
-            # Max Len    = 34
-            #    B0:1    = UINT16  - Flag (MANDATORY)
-            #      b0    = Pedal power balance present; 0 = false, 1 = true
-            #      b1    = Pedal power balance reference; 0 = unknown, 1 = left
-            #      b2    = Accumulated torque present; 0 = false, 1 = true
-            #      b3    = Accumulated torque source; 0 = wheel, 1 = crank
-            #      b4    = Wheel revolution data present; 0 = false, 1 = true
-            #      b5    = Crank revolution data present; 0 = false, 1 = true
-            #      b6    = Extreme force magnatudes present; 0 = false, 1 = true
-            #      b7    = Extreme torque magnatues present; 0 = false, 1 = true
-            #      b8    = Extreme angles present; 0 = false, 1 = true
-            #      b9    = Top dead angle present; 0 = false, 1 = true
-            #      b10   = Bottom dead angle present; 0 = false, 1 = true
-            #      b11   = Accumulated energy present; 0 = false, 1 = true
-            #      b12   = Offset compensation indicator; 0 = false, 1 = true
-            #      b13   = Reseved
-            #      b14   = n/a
-            #      b15   = n/a
-            #    B2:3    = SINT16 - Instataineous power, Watts (decimal)
-            #    B4      = UINT8  -  Pedal power balance, Percent (binary) 1/2
-            #    B5:6    = UINT16 - Accumulated torque, Nm; res (binary) 1/32
-            #    B7:10   = UINT32 - Cumulative wheel revolutions, (decimal)
-            #    B11:12  = UINT16 - Last wheel event time, second (binary) 1/2048
-            #    B13:14  = UINT16 - Cumulative crank revolutions, (decimal)
-            #    B15:16  = UINT16 - Last crank event time, second (binary) 1/1024 
-            #    B17:18  = SINT16 - Max force magnitude, Newton (decimal)
-            #    B19:20  = SINT16 - Min force magnitude, Newton (decimal)
-            #    B21:22  = SINT16 - Max torque magnitude, Nm (binary) 1/1024
-            #    B23:24  = SINT16 - Min torque magnitude, Nm (binary) 1/1024
-            #    B25:26  = UINT12 - Max angle, degree (decimal)
-            #    B27:28  = UINT12 - Min angle, degree (decimal)
-            #    B29:30  = UINT16 - Top dead spot angle, degree (decimal)
-            #    B31:32  = UINT16 - Bottom dead spot angle, degree (decimal)
-            #    B33:34  = UINT16 - Accumulated energy, kJ (decimal)
-        
         if ble_in_q_value:
             values = Convert_Waterrower_raw()
             power = values["watts"].to_bytes(2, 'little')
-            cadence = (values["total_strokes"] * 2).to_bytes(2, 'little')
-            elapsedtime = (values["elapsedtime"] * 1024) & 0xFFFF
-            time = elapsedtime.to_bytes(2, 'little')
-            
-            logger.info("total_strokes: " + str(values["total_strokes"]))
-            logger.info("elapsedtime: " + str(values["elapsedtime"]))
+            cadence = (values["stroke_rate"] * 2).to_bytes(2, 'little')
 
+            # Bit  Definition
+            # 0     More Data
+            # 1     Average Speed
+            # 2     Instantaneous Cadence
+            # 3     Average Cadence
+            # 4     Total Distance 
+            # 5     Resistance Leve
+            # 6     Instantaneous Power
+            # 7     Average Power
+            # 8     Expended Energy
+            # 9     Heart Rate
+            # 10    Metabolic Equivalent
+            # 11    Elapsed Time
+            # 12    Remaining Time
+            # 13    Elapsed Time Supported
+            # 14    Remaining Time Supported     
+            
             value = [
-                dbus.Byte(0b00100001), dbus.Byte(0x00),                     # 16-bit Flags
-                dbus.Byte(power[0]), dbus.Byte(power[1]),                   #    B2:3    = SINT16 - Instataineous power, Watts (decimal)
-                #    B4      = UINT8  -  Pedal power balance, Percent (binary) 1/2
-                #    B5:6    = UINT16 - Accumulated torque, Nm; res (binary) 1/32
-                #    B7:10   = UINT32 - Cumulative wheel revolutions, (decimal)
-                #    B11:12  = UINT16 - Last wheel event time, second (binary) 1/2048
-                dbus.Byte(cadence[0]), dbus.Byte(cadence[1]),                #    B13:14  = UINT16 - Cumulative crank revolutions, (decimal)
-                dbus.Byte(time[0]), dbus.Byte(time[1])                       #    B15:16  = UINT16 - Last crank event time, second (binary) 1/1024 
-                #    B17:18  = SINT16 - Max force magnitude, Newton (decimal)
-                #    B19:20  = SINT16 - Min force magnitude, Newton (decimal)
-                #    B21:22  = SINT16 - Max torque magnitude, Nm (binary) 1/1024
-                #    B23:24  = SINT16 - Min torque magnitude, Nm (binary) 1/1024
-                #    B25:26  = UINT12 - Max angle, degree (decimal)
-                #    B27:28  = UINT12 - Min angle, degree (decimal)
-                #    B29:30  = UINT16 - Top dead spot angle, degree (decimal)
-                #    B31:32  = UINT16 - Bottom dead spot angle, degree (decimal)
-                #    B33:34  = UINT16 - Accumulated energy, kJ (decimal)
+                dbus.Byte(0b11000101), dbus.Byte(0x00),                     # 16-bit Flags
+                dbus.Byte(cadence[0]), dbus.Byte(cadence[1]),
+                dbus.Byte(power[0]), dbus.Byte(power[1]),
+                dbus.Byte(power[0]), dbus.Byte(power[1]),
             ]
 
             self.PropertiesChanged(GATT_CHRC_IFACE, { 'Value': value }, [])
@@ -448,17 +404,19 @@ class FitnessMachineControlPoint(Characteristic):
             print('Reset')
             self.fmcp_cb(byte)
 
-class CyclingAdvertisement(Advertisement):
+class FitnessMachineAdvertisement(Advertisement):
     def __init__(self, bus, index):
         Advertisement.__init__(self, bus, index, "peripheral")
         self.add_manufacturer_data(
             0xFFFF, [0x77, 0x72],
         )
         self.add_service_uuid(DeviceInformation.DEVICE_INFORMATION_UUID)
-        self.add_service_uuid(CyclingPowerService.CYCLING_POWER_UUID)
+        self.add_service_uuid(FitnessMachineService.FITNESS_MACHINE_UUID)
+        # Fitness Machine Available Bit 1, Indoor Bike Supported Bit 5
+        self.add_service_data(FitnessMachineService.FITNESS_MACHINE_UUID, [0b00000001, 0b00100000, 0b00000000] )
 
         #self.add_local_name("S4 Comms PI")
-        self.add_local_name("PiRowFlo")
+        self.add_local_name("WaterRower")
         self.include_tx_power = True
 
 
@@ -506,14 +464,14 @@ def main(out_q,ble_in_q): #out_q
     service_manager = dbus.Interface(adapter_obj, GATT_MANAGER_IFACE)
     ad_manager = dbus.Interface(adapter_obj, LE_ADVERTISING_MANAGER_IFACE)
 
-    advertisement = CyclingAdvertisement(bus, 0)
+    advertisement = FitnessMachineAdvertisement(bus, 0)
     obj = bus.get_object(BLUEZ_SERVICE_NAME, "/org/bluez")
 
     agent = Agent(bus, AGENT_PATH)
 
     app = Application(bus)
     app.add_service(DeviceInformation(bus, 1))
-    app.add_service(CyclingPowerService(bus, 2))
+    app.add_service(FitnessMachineService(bus, 2))
 
     mainloop = MainLoop()
 
